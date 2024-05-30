@@ -52,22 +52,34 @@ pipeline {
     }
     
     post {
+        always {
+            script {
+                // Collecting logs
+                def log = currentBuild.rawBuild.getLog(100).join('\n')
+                writeFile file: 'build.log', text: log
+                archiveArtifacts artifacts: 'build.log'
+            }
+        }
+        
         success {
             emailext(
-                to: 'gpranav2901@gmail.com',
                 subject: 'Build Successful',
-                body: """<p>Build completed successfully.</p>
-                         <p>Here are the logs:</p>
-                         <pre>${currentBuild.rawBuild.getLog(100).join("\n")}</pre>"""
+                body: """
+                Build completed successfully.
+                Check the logs at: ${env.BUILD_URL}/artifact/build.log
+                """,
+                to: 'gpranav2901@gmail.com'
             )
         }
+        
         failure {
             emailext(
-                to: 'gpranav2901@gmail.com',
                 subject: 'Build Failed',
-                body: """<p>Build failed.</p>
-                         <p>Here are the logs:</p>
-                         <pre>${currentBuild.rawBuild.getLog(100).join("\n")}</pre>"""
+                body: """
+                Build failed.
+                Check the logs at: ${env.BUILD_URL}/artifact/build.log
+                """,
+                to: 'gpranav2901@gmail.com'
             )
         }
     }
