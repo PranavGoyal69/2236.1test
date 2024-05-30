@@ -53,17 +53,21 @@ pipeline {
     
     post {
         success {
-            mail(
+            emailext(
                 to: 'gpranav2901@gmail.com',
                 subject: 'Build Successful',
-                body: 'Build completed successfully'
+                body: """<p>Build completed successfully.</p>
+                         <p>Here are the logs:</p>
+                         <pre>${currentBuild.rawBuild.getLog(100).join("\n")}</pre>"""
             )
         }
         failure {
-            mail(
+            emailext(
                 to: 'gpranav2901@gmail.com',
                 subject: 'Build Failed',
-                body: 'Build failed'
+                body: """<p>Build failed.</p>
+                         <p>Here are the logs:</p>
+                         <pre>${currentBuild.rawBuild.getLog(100).join("\n")}</pre>"""
             )
         }
     }
